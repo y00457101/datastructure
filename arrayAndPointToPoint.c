@@ -1,29 +1,34 @@
-#include<stdio.h>
-#include<stdlib.h>
+/* 二维数组做函数参数注意事项 
+  1.函数申明中必须指明数组的列
+    void Func(int array[][10]);  YES
+    void Func(int (*array)[10]); YES 参数是个指针，指向具有10个元素的一维数组
+    void Func(int *array[10]);    NO 参数是个数组，数组有10个类型是(int*)的元素
+    -----------实参---------------------------形参----------------
+      数组的数组 char c[8][10]        数组指针    char(*c)[10]     
+      指针数组   char *c[15]          指针的指针  char **c         
+      数组指针   char(*c)[10]         数组指针    char(*c)[10]     
+      指针的指针 char **c             指针的指针  char **c         
+    --------------------------------------------------------------
+*/
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 
-#define ROW 2
-#define COL 3
+#define MSIZE 3
+#define MCOLS 4
 
-/**
- * Return an array of arrays of size *returnSize.
- * The sizes of the arrays are returned as *returnColumnSizes array.
- * Note: Both returned array and *columnSizes array must be malloced, assume caller calls free().
- A     : 二维数组地址 ASize : 二维数组的行数
- AColSize : 二维数组的列数    returnSize ：转置后的数组的行数；
- returnColumnSizes : 转置后的数组的列数
- */
-int** transpose(int** A, int ASize, int* AColSize, int* returnSize, int** returnColumnSizes){
+int** transpose(int** A, int ASize, int *AColSize, int* returnSize, int** returnColumnSizes){
     if(!A) return NULL;
-    int col = * AColSize;
+    int col = *AColSize;
     int row = ASize;
-
-    int** ret = (int** )malloc(col*sizeof(int*));
-    *returnColumnSizes = (int*)malloc(sizeof(int) * col);
     *returnSize = col;
-
+    //申请可以存放col个元素的int*类型的数组大小的内存，申请到的内存地址存放在ret变量里
+    int** ret = (int** )malloc(col*sizeof(int*));
+    //申请可以存放col个元素的int类型的数组大小的内存，申请到的地址存在在returnColumnSizes所指向的内存单元里
+    *returnColumnSizes = (int*)malloc(sizeof(int) * col);
     for( int i = 0; i < col; i++ ) {
         ret[i] = (int*)malloc(sizeof(int)*row);
-        returnColumnSizes[0][i] = row;
+        (*returnColumnSizes)[i] = row;
     }
 
     for (int i = 0; i < row; i++) {
@@ -34,40 +39,50 @@ int** transpose(int** A, int ASize, int* AColSize, int* returnSize, int** return
     return ret;
 }
 
-void print(int **p, int row, int col)
+void printArray(int **a, int mSize, int mColSize)
 {
-	int i=0,j=0;
-	for(i=0;i<row;i++) {
-		for(j=0;j<col;j++) {
-			printf("%d\t",p[i][j]);
-		}
-		printf("\n");
-	}
-	printf("\n");
+    int i, j;
+    for (i = 0; i < mSize; i++) {
+        for (j = 0; j < mColSize; j++) {
+            printf("%d ", a[i][j]);
+        }
+        printf("\n");
+    }
 }
 
 int main()
 {
-    int returnSize;
-    int columnSize = COL;
-    int **returnColumnSizes;
+    int returnSize = 0;
+    int** returnColumnSizes;
+    int m[MSIZE][MCOLS] = { {1, 2, 3, 9}, {1, 6, 7, 9},  {1, 7, 8, 9} };
+    int colSize[MSIZE] = {4, 4, 4};
 
-    int bi_array[ROW][COL] = {{4,5,6},{7,8,9}};
+    /* 二重指针int** 和 指针数组int*[] 参数类型匹配 */
+    /* 先把二位数组转化为指针数组，再做实参调用 */
+    int *newM[MSIZE] = {m[0], m[1], m[2]};
 
-    int ** inputArray = (int **)malloc(sizeof(int *) * ROW);
-    inputArray[0] = (int*)malloc(sizeof(int) * COL);
-    inputArray[1] = (int*)malloc(sizeof(int) * COL);
-
-    inputArray=(int **)bi_array;
-
-    int** ret = transpose(inputArray, ROW, &columnSize, &returnSize, returnColumnSizes);
-    int** ret = transpose(inputArray, ROW, &columnSize, &returnSize);
-    print(ret,3,2);
+    /*动态申请的指针数组也可以直接做函数实参*/
+    int **newN = (int **)malloc(MSIZE*sizeof(int *));
+    if (newN == NULL) return NULL;
     
-    free(inputArray[0]);
-    free(inputArray[1]);
-    free(ret);
+    for(int i = 0; i < MSIZE; i++) {
+        newN[i] = (int *)malloc(MCOLS * sizeof(int));
+        if (newN == NULL) return NULL;
+        memset(newN[i], 0, sizeof(newN[i]));
+    }
+
+    for(int i = 0; i < MSIZE; i++) {
+        for(int j = 0; j < MCOLS; j++) {
+            newN[i][j] = m[i][j];
+        }
+    }
+
+    int **retM = transpose(newN, MSIZE, colSize, &returnSize, returnColumnSizes);
+    printArray(retM, returnSize, (*returnColumnSizes)[0]);
+
+    for(int i = 0; i < MSIZE; i++) {
+        free(retM[i]);
+    }
+    free(retM);
     return 0;
 }
-
-
