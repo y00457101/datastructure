@@ -1,6 +1,51 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+/* 冒泡排序 */
+void bubble_sort(int arr[], int len)
+{
+    int i, j, temp;
+    for (i = 0; i < len-1; i++) {
+        for (j = 0; j < len-i-1; j++) {
+            if (arr[j] > arr[j+1]) {
+                temp = arr[j+1];
+                arr[j+1] = arr[j];
+                arr[j] = temp;
+            }
+        }
+    }
+}
+
+/* 选择排序 */
+void swap(int *a, int*b)
+{
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+void select_sort(int arr[], int len)
+{
+    int i, j, temp;
+    for (i = 0; i < len-1; i++) {
+        for (j = i+1; j < len; j++) {
+            if ( arr[i] > arr[j]) {
+                swap(&arr[i], &arr[j]);
+            }
+        }
+    }
+}
+
+/* 插入排序 */
+void insertion_sort(int arr[], int len){
+    int i, j, temp;
+    for (i = 1; i < len; i++){
+        temp = arr[i];
+        for (j = i; j>0 && arr[j-1] > temp; j--)
+            arr[j] = arr[j-1];
+        arr[j] = temp;
+    }
+}
+/* 快速排序 */
 int Partion(int *arr,int low,int high)
 {
 	int temp = arr[low];
@@ -46,6 +91,9 @@ int main()
 {
 	int arr[] = {33,25,16,48,28,9,79};
 	int len = sizeof(arr) / sizeof(arr[0]);
+  //    bubble_sort(arr, len);
+  //    select_sort(arr, len);
+  //    insertion_sort(arr, len);
 	QuickSort(arr, len);
 	for (int i = 0; i < len; i++) {
 		printf("%d ", arr[i]);
