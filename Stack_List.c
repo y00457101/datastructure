@@ -1,8 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <stdbool.h>
 
-/*用数组存储栈*/
 #define MAXSIZE 20
 
 typedef int elementType;    //数据类型
@@ -34,10 +34,16 @@ void StackPop(Stack* s) {
     s->top--;
 }
 
-int StackTop(Stack* s) {
+elementType StackTop(Stack* s) {
     if (s->top == 0)
         return -1;
     return s->array[s->top - 1];
+}
+
+bool StackIsEmpty(Stack* s) {
+    if (s->top == 0)
+        return true;
+    return false;
 }
 
 void StackFree(Stack* s) {
@@ -56,6 +62,7 @@ int main()
     StackPush(stack, 7);
     StackPop(stack);
     elementType param_3 = StackTop(stack);
+    bool ret = StackIsEmpty(stack);
     StackFree(stack);
     return 0;
 }
